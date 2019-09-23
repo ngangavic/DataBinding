@@ -10,7 +10,11 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.example.databinding.databinding.FragmentViewProductBinding;
+import com.example.databinding.models.Product;
+import com.example.databinding.models.ProductViewModel;
 import com.example.databinding.util.Products;
+
+
 
 public class ViewProductFragment extends Fragment {
 
@@ -19,16 +23,28 @@ public class ViewProductFragment extends Fragment {
     // Data binding
     FragmentViewProductBinding mBinding;
 
+    //vars
+    private Product mProduct;
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        Bundle bundle = this.getArguments();
+        if(bundle != null) {
+            mProduct = bundle.getParcelable(getString(R.string.intent_product));
+        }
+    }
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         mBinding = FragmentViewProductBinding.inflate(inflater);
 
-        Products products = new Products();
-        mBinding.setProduct(products.PRODUCTS[0]);
+        ProductViewModel viewProductModel = new ProductViewModel();
+        viewProductModel.setProduct(mProduct);
+        viewProductModel.setQuantity(1);
 
-        mBinding.setQty(1);
+        mBinding.setProductView(viewProductModel);
 
         return mBinding.getRoot();
     }

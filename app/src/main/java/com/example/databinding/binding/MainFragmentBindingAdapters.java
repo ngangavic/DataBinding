@@ -27,6 +27,7 @@ public class MainFragmentBindingAdapters {
             view.setAdapter(adapter);
         }
     }
+
 }
 
 

@@ -1,10 +1,12 @@
 package com.example.databinding.binding;
 
 import android.content.Context;
+import android.util.Log;
 import android.widget.ImageView;
 import androidx.databinding.BindingAdapter;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.databinding.R;
 
@@ -43,7 +45,26 @@ public class GlideBindingAdapters {
                 .into(view);
     }
 
+
+    @BindingAdapter({"requestListener", "imageResource"})
+    public static void bindRequestListener(ImageView view, RequestListener listener, int imageResource){
+        Log.d(TAG, "bindRequestListener: setting image resource.");
+
+        Context context = view.getContext();
+
+        RequestOptions options = new RequestOptions()
+                .placeholder(R.drawable.ic_launcher_background)
+                .error(R.drawable.ic_launcher_background);
+
+        Glide.with(context)
+                .setDefaultRequestOptions(options)
+                .load(imageResource)
+                .listener(listener)
+                .into(view);
+    }
+
 }
+
 
 
 

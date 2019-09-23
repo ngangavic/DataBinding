@@ -63,16 +63,3 @@ public class ProductViewModel extends BaseObservable {
         };
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-

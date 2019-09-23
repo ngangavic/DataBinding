@@ -45,9 +45,6 @@ public class ProductsAdapter extends  RecyclerView.Adapter<ProductsAdapter.Bindi
 
         return new BindingHolder(binding.getRoot());
     }
-
-
-
     @Override
     public void onBindViewHolder(BindingHolder holder, final int position) {
         Product product = mProducts.get(position);
@@ -64,7 +61,7 @@ public class ProductsAdapter extends  RecyclerView.Adapter<ProductsAdapter.Bindi
 
     public class BindingHolder extends RecyclerView.ViewHolder{
 
-//        ViewDataBinding binding;
+        //        ViewDataBinding binding;
         ProductItemBinding binding;
 
         public BindingHolder(View itemView) {
@@ -72,7 +69,6 @@ public class ProductsAdapter extends  RecyclerView.Adapter<ProductsAdapter.Bindi
             binding = DataBindingUtil.bind(itemView);
         }
     }
-
 
 
 }
