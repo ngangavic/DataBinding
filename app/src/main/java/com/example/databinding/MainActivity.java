@@ -6,6 +6,7 @@ import androidx.fragment.app.FragmentTransaction;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -31,19 +32,31 @@ public class MainActivity extends AppCompatActivity implements IMainActivity{
     //data binding
     ActivityMainBinding mBinding;
 
+
+    //vars
+    private boolean mClickToExit = false;
+    private Runnable mCheckoutRunnable;
+    private Handler mCheckoutHandler;
+    private int mCheckoutTimer = 0;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_main);
+        mBinding.cart.setOnTouchListener(new CartTouchListener());
+        mBinding.proceedToCheckout.setOnClickListener(mCheckOutListener);
 
+        getShoppingCart();
         init();
     }
+
     private void init(){
         MainFragment fragment = new MainFragment();
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.replace(R.id.main_container, fragment, getString(R.string.fragment_main));
         transaction.commit();
     }
+
 
     private void getShoppingCart(){
         Log.d(TAG, "getShoppingCart: getting shopping cart.");
@@ -69,6 +82,53 @@ public class MainActivity extends AppCompatActivity implements IMainActivity{
         mBinding.setCartView(viewModel);
     }
 
+    public void checkout(){
+        Log.d(TAG, "checkout: checking out.");
+
+        mBinding.progressBar.setVisibility(View.VISIBLE);
+
+        mCheckoutHandler = new Handler();
+        mCheckoutRunnable  = new Runnable() {
+            @Override
+            public void run() {
+                mCheckoutHandler.postDelayed(mCheckoutRunnable, 200);
+                mCheckoutTimer += 200;
+                if(mCheckoutTimer >= 1600){
+                    emptyCart();
+                    mBinding.progressBar.setVisibility(View.GONE);
+                    mCheckoutHandler.removeCallbacks(mCheckoutRunnable);
+                    mCheckoutTimer = 0;
+                }
+            }
+        };
+        mCheckoutRunnable.run();
+    }
+
+    private void emptyCart(){
+        Log.d(TAG, "emptyCart: emptying cart.");
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        Set<String> serialNumbers = preferences.getStringSet(PreferenceKeys.shopping_cart, new HashSet<String>());
+        SharedPreferences.Editor editor = preferences.edit();
+
+        for(String serialNumber : serialNumbers){
+            editor.remove(serialNumber);
+            editor.commit();
+        }
+
+        editor.remove(PreferenceKeys.shopping_cart);
+        editor.commit();
+        Toast.makeText(this, "thanks for shopping!", Toast.LENGTH_SHORT).show();
+        removeViewCartFragment();
+        getShoppingCart();
+    }
+
+    public View.OnClickListener mCheckOutListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            checkout();
+        }
+    };
+
     public static class CartTouchListener implements View.OnTouchListener{
 
         @Override
@@ -86,6 +146,16 @@ public class MainActivity extends AppCompatActivity implements IMainActivity{
             }
 
             return true;
+        }
+    }
+
+    public void removeViewCartFragment(){
+        getSupportFragmentManager().popBackStack();
+        ViewCartFragment fragment = (ViewCartFragment) getSupportFragmentManager().findFragmentByTag(getString(R.string.fragment_view_cart));
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        if(fragment != null){
+            transaction.remove(fragment);
+            transaction.commit();
         }
     }
 
@@ -171,5 +241,69 @@ public class MainActivity extends AppCompatActivity implements IMainActivity{
 
         // notify the user
         Toast.makeText(this, "added to cart", Toast.LENGTH_SHORT).show();
+    }
+
+    /*
+        Updates the quantity of an item in the cart (ViewCartFragment)
+     */
+    @Override
+    public void updateQuantity(Product product, int quantity) {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        SharedPreferences.Editor editor = preferences.edit();
+
+        //add the quantity
+        int currentQuantity = preferences.getInt(String.valueOf(product.getSerial_number()), 0);
+
+        //commit the updated quantity
+        editor.putInt(String.valueOf(product.getSerial_number()), (currentQuantity + quantity));
+        editor.commit();
+
+        getShoppingCart();
+    }
+
+    @Override
+    public void removeCartItem(CartItem cartItem){
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        SharedPreferences.Editor editor = preferences.edit();
+
+        editor.remove(String.valueOf(cartItem.getProduct().getSerial_number()));
+        editor.commit();
+
+        Set<String> serialNumbers = preferences.getStringSet(PreferenceKeys.shopping_cart, new HashSet<String>());
+        if(serialNumbers.size() == 1){
+            editor.remove(PreferenceKeys.shopping_cart);
+            editor.commit();
+        }
+        else{
+            serialNumbers.remove(String.valueOf(cartItem.getProduct().getSerial_number()));
+            editor.putStringSet(PreferenceKeys.shopping_cart, serialNumbers);
+            editor.commit();
+        }
+
+        getShoppingCart();
+
+        //remove the item from the list in ViewCartFragment
+        ViewCartFragment fragment = (ViewCartFragment)getSupportFragmentManager().findFragmentByTag(getString(R.string.fragment_view_cart));
+        if(fragment != null){
+            fragment.updateCartItems();
+        }
+    }
+
+
+    @Override
+    public void onBackPressed() {
+        int backStackCount = getSupportFragmentManager().getBackStackEntryCount();
+        Log.d(TAG, "onBackPressed: backstack count: " + backStackCount);
+        if (backStackCount == 0 && mClickToExit) {
+            super.onBackPressed();
+        }
+        if (backStackCount == 0 && !mClickToExit) {
+            Toast.makeText(this, "1 more click to exit.", Toast.LENGTH_SHORT).show();
+            mClickToExit = true;
+        }
+        else{
+            mClickToExit = false;
+            super.onBackPressed();
+        }
     }
 }
