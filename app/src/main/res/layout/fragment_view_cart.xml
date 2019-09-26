@@ -4,6 +4,9 @@
         <variable
             name="iMainActivity"
             type="com.example.databinding.IMainActivity"/>
+        <variable
+            name="cartView"
+            type="com.example.databinding.models.CartViewModel"/>
     </data>
     <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                     android:layout_width="match_parent"
