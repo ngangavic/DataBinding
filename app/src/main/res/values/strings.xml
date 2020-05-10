@@ -1,18 +1,14 @@
 <resources>
-    <string name="app_name">Data Binding</string>
-
-    <!-- dialog tags -->
-    <string name="dialog_choose_quantity">Choose Quantity</string>
-
-    <!-- fragment tags -->
-    <string name="fragment_main">Main</string>
-    <string name="fragment_view_product">View Product</string>
-    <string name="fragment_view_cart">View Cart</string>
-
-    <!-- Intent keys -->
-    <string name="intent_product">intent_product</string>
-
-    <!-- Strings -->
-    <string name="cart_subtotal">Cart subtotal</string>
-    <string name="proceed_to_checkout">Proceed to Checkout</string>
+    <string name="app_name">Go-Buy</string>
+    <string name="add_item">Add Item</string>
+    <string name="add_new_item_dialog_title">Add New Item</string>
+    <string name="edit_item_dialog_title">Edit Item</string>
+    <string name="save_button">Save</string>
+    <string name="button_edit">Edit</string>
+    <string name="button_delete">Delete</string>
+    <string name="money_amount_zero">$0.00</string>
+    <string name="total">Total</string>
+    <string name="product_name">Product name</string>
+    <string name="amount">Amount</string>
+    <string name="price">Price</string>
 </resources>
