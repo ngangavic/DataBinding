@@ -2,14 +2,11 @@ package com.example.databinding
 
 import android.os.Bundle
 import android.util.Log
-import android.widget.Button
-import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.example.databinding.databinding.ActivityMainBinding
 import com.example.databinding.model.GroceryItem
 import com.example.databinding.view.GroceryAdapter
@@ -21,11 +18,11 @@ class MainActivity : AppCompatActivity(), NewItemDialogFragment.NewItemDialogLis
 
     lateinit var viewModel: GroceryListViewModel
 
-    private lateinit var binding:ActivityMainBinding
+    private lateinit var binding: ActivityMainBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = DataBindingUtil.setContentView(this,R.layout.activity_main)
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
         viewModel = ViewModelProviders.of(this).get(GroceryListViewModel::class.java)
 
         // TODO: associate the layout manager, adapter and button listener with the binding object
