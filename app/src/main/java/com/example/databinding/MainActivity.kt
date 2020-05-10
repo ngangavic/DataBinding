@@ -5,10 +5,12 @@ import android.util.Log
 import android.widget.Button
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.databinding.databinding.ActivityMainBinding
 import com.example.databinding.model.GroceryItem
 import com.example.databinding.view.GroceryAdapter
 import com.example.databinding.view.NewItemDialogFragment
@@ -19,30 +21,21 @@ class MainActivity : AppCompatActivity(), NewItemDialogFragment.NewItemDialogLis
 
     lateinit var viewModel: GroceryListViewModel
 
-    // TODO: remove the view items and change them for the binding object
-    private lateinit var addItemButton: Button
-    private lateinit var groceryListRecyclerView: RecyclerView
-    private lateinit var groceriesTotal: TextView
+    private lateinit var binding:ActivityMainBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        binding = DataBindingUtil.setContentView(this,R.layout.activity_main)
         viewModel = ViewModelProviders.of(this).get(GroceryListViewModel::class.java)
-
-
-        // TODO: initialize the binding object and remove the view invocations
-        addItemButton = findViewById(R.id.add_item_button)
-        groceryListRecyclerView = findViewById(R.id.rv_grocery_list)
-        groceriesTotal = findViewById(R.id.total_text_view)
 
         // TODO: associate the layout manager, adapter and button listener with the binding object
 
-        groceryListRecyclerView.layoutManager = LinearLayoutManager(this)
+        binding.rvGroceryList.layoutManager = LinearLayoutManager(this)
 
-        groceryListRecyclerView.adapter = GroceryAdapter(viewModel.groceryListItems, this,
+        binding.rvGroceryList.adapter = GroceryAdapter(viewModel.groceryListItems, this,
                 ::editGroceryItem, ::deleteGroceryItem)
 
-        addItemButton.setOnClickListener {
+        binding.addItemButton.setOnClickListener {
             addGroceryItem()
         }
 
@@ -53,19 +46,16 @@ class MainActivity : AppCompatActivity(), NewItemDialogFragment.NewItemDialogLis
             viewModel.groceryListItems.add(item)
         } else {
             viewModel.updateItem(position!!, item)
-            // TODO: call the adapter from the binding object
-            groceryListRecyclerView.adapter?.notifyDataSetChanged()
+            binding.rvGroceryList.adapter?.notifyDataSetChanged()
         }
 
-        // TODO: update the total amount and addItemButton with the binding
-        groceriesTotal.text = viewModel.getTotal().toString()
+        binding.totalAmount = viewModel.getTotal().toString()
 
-        Snackbar.make(addItemButton, "Item Added Successfully", Snackbar.LENGTH_LONG).setAction("Action", null).show()
+        Snackbar.make(binding.addItemButton, "Item Added Successfully", Snackbar.LENGTH_LONG).setAction("Action", null).show()
     }
 
     override fun onDialogNegativeClick(dialog: DialogFragment) {
-        // TODO: update the addItemButton with the binding
-        Snackbar.make(addItemButton, "Nothing Added", Snackbar.LENGTH_LONG).setAction("Action", null).show()
+        Snackbar.make(binding.addItemButton, "Nothing Added", Snackbar.LENGTH_LONG).setAction("Action", null).show()
     }
 
     private fun addGroceryItem() {
@@ -83,9 +73,8 @@ class MainActivity : AppCompatActivity(), NewItemDialogFragment.NewItemDialogLis
     private fun deleteGroceryItem(position: Int) {
         Log.d("GoBuy", "delete")
         viewModel.removeItem(position)
-        groceriesTotal.text = viewModel.getTotal().toString()
-        // TODO: call the adapter from the binding object
-        groceryListRecyclerView.adapter?.notifyDataSetChanged()
+        binding.totalAmount = viewModel.getTotal().toString()
+        binding.rvGroceryList.adapter?.notifyDataSetChanged()
     }
 
 }
